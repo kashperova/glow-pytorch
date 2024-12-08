@@ -40,9 +40,7 @@ class ActNorm(FlowBlock):
             self.__init_params(x)
 
         _, _, h, w = x.shape
-
-        log_abs = torch.log(torch.abs(self.scale))
-        log_det = h * w * torch.sum(log_abs)
+        log_det = h * w * torch.sum(self._log_abs(self.scale))
 
         return x * self.scale + self.bias, log_det
 
