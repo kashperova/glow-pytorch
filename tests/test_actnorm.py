@@ -5,13 +5,19 @@ from model.actnorm import ActNorm
 
 
 class TestActNorm:
+    in_ch: int = 3
+    batch_size: int = 16
+    image_size: int = 32
+
     @pytest.fixture
     def input_batch(self):
-        return torch.randn(16, 3, 32, 32)
+        return torch.randn(
+            self.batch_size, self.in_ch, self.image_size, self.image_size
+        )
 
     @pytest.fixture
     def act_norm(self):
-        return ActNorm(in_ch=3)
+        return ActNorm(in_ch=self.in_ch)
 
     def test_init(self, act_norm, input_batch):
         assert not act_norm.initialized, "initialized before the 1st forward pass"
@@ -55,4 +61,4 @@ class TestActNorm:
         out, log_det = act_norm(input_batch)
         _, _, h, w = input_batch.shape
         expected = h * w * torch.sum(torch.log(torch.abs(act_norm.scale)))
-        assert log_det == expected, f"log_det not equal to expected value."
+        assert log_det == expected, f"log det not equal to expected value."

@@ -28,7 +28,7 @@ class InvertConv(FlowBlock):
 
     def __init__(self, in_ch: int):
         super().__init__()
-        weight_matrix = torch.qr(torch.rand(in_ch, in_ch))[0]
+        weight_matrix = torch.linalg.qr(torch.rand(in_ch, in_ch))[0]
         perm_matrix, lt_matrix, ut_matrix = torch.linalg.lu(weight_matrix)
         self.register_buffer("perm_matrix", perm_matrix)
 
@@ -47,7 +47,7 @@ class InvertConv(FlowBlock):
         self.s_vector = nn.Parameter(self._log_abs(s_diag + 1e-6))
         self.register_buffer("s_sign", torch.sign(s_diag))
 
-    def __get_weights(self) -> Tensor:
+    def get_weights(self) -> Tensor:
         # reconstruct L and U decomposition matrices
         l_matrix = self.lt_matrix * self.l_mask + self.l_eye
         u_matrix = self.ut_matrix * self.u_mask + torch.diag(
@@ -58,13 +58,13 @@ class InvertConv(FlowBlock):
 
     def forward(self, x: Tensor) -> tuple[Tensor, Tensor]:
         _, _, h, w = x.shape
-        weights = self.__get_weights()
+        weights = self.get_weights()
         log_det = h * w * torch.sum(self.s_vector)
-        out = F.conv2d(x, weights)
+        out = F.conv2d(x, weights.unsqueeze(2).unsqueeze(3))
         return out, log_det
 
     def reverse(self, x: Tensor) -> Tensor:
-        weights = self.__get_weights()
+        weights = self.get_weights()
         # since W is an orthogonal matrix, W^(-1) = W.T
-        out = F.conv2d(x, weights.T)
+        out = F.conv2d(x, weights.T.unsqueeze(2).unsqueeze(3))
         return out
