@@ -39,7 +39,7 @@ class TestActNorm:
         reverse_out = act_norm.reverse(out)
         assert torch.allclose(
             input_batch, reverse_out, atol=1e-5
-        ), "shape after reverse != input shape."
+        ), "batch after reverse != input batch."
 
     def test_norm_mean(self, act_norm, input_batch):
         out, _ = act_norm(input_batch)

@@ -28,7 +28,7 @@ class TestInvertConv:
         reverse_out = invert_conv.reverse(out)
         assert torch.allclose(
             input_batch, reverse_out, atol=1e-5
-        ), "shape after reverse != input shape."
+        ), "batch after reverse != input batch."
 
     def test_log_det(self, invert_conv, input_batch):
         _, _, h, w = input_batch.shape
