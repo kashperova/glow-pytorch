@@ -1,24 +1,7 @@
-import pytest
 import torch
-
-from model.actnorm import ActNorm
 
 
 class TestActNorm:
-    in_ch: int = 3
-    batch_size: int = 16
-    image_size: int = 32
-
-    @pytest.fixture
-    def input_batch(self):
-        return torch.randn(
-            self.batch_size, self.in_ch, self.image_size, self.image_size
-        )
-
-    @pytest.fixture
-    def act_norm(self):
-        return ActNorm(in_ch=self.in_ch)
-
     def test_init(self, act_norm, input_batch):
         assert not act_norm.initialized, "initialized before the 1st forward pass"
         act_norm(input_batch)

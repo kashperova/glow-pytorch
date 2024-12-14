@@ -2,10 +2,10 @@ import torch
 from torch import Tensor
 
 from model.affine_coupling.net import NN
-from model.flow_block import FlowBlock
+from model.invert_block import InvertBlock
 
 
-class AffineCoupling(FlowBlock):
+class AffineCoupling(InvertBlock):
     """
     Affine coupling layer is reverse function
     that split input tensor on 2 parts,

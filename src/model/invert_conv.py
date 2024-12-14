@@ -2,10 +2,10 @@ import torch
 from torch import Tensor, nn
 from torch.nn import functional as F
 
-from model.flow_block import FlowBlock
+from model.invert_block import InvertBlock
 
 
-class InvertConv(FlowBlock):
+class InvertConv(InvertBlock):
     """
     invertible conv layer where weights
     are obtained by LU decomposition;

@@ -1,10 +1,10 @@
 import torch
 from torch import nn, Tensor
 
-from model.flow_block import FlowBlock
+from model.invert_block import InvertBlock
 
 
-class ActNorm(FlowBlock):
+class ActNorm(InvertBlock):
     """
     invertible normalization  layer with params
     that initialized on the 1st forward pass;
