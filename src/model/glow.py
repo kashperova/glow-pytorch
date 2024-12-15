@@ -6,6 +6,16 @@ from model.invert_block import InvertBlock
 
 class Glow(InvertBlock):
     """
+    Glow model that contains L blocks with K flows in each;
+    Each block to L-1 performs squeeze, K flow steps and split operations;
+    Only last Lth block performs squeeze and K flow steps (w/o split)
+    (Figure 2b in original paper).
+
+    z has hierarchical structure (to reduce computational and memory recourses);
+    At each level, half of the data dimension is excluded from the current processing
+    and stored separately in z_list (more details in section 3.6, Real-NVP paper);
+    For this purpose, the split operation is used.
+
     n_flows: int
         K in original paper
     num_blocks: int
@@ -35,7 +45,7 @@ class Glow(InvertBlock):
                     squeeze_factor=squeeze_factor,
                 )
             )
-            in_ch *= 2  # todo: write in doc string about multi-scaling form Real-NVP
+            in_ch *= 2  # required for squeeze
 
         self.blocks.append(
             FlowBlock(
@@ -52,7 +62,7 @@ class Glow(InvertBlock):
         log_p_total = 0.0
         z_list = []
         for block in self.blocks:
-            out, log_det, log_p, z_new = block(x)
+            x, log_det, log_p, z_new = block(x)
             log_det_jacob += log_det
             log_p_total += log_p
             z_list.append(z_new)

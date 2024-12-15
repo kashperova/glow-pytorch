@@ -6,17 +6,15 @@ from torch import Tensor
 from model.affine_coupling.zero_conv import ZeroConv2d
 from model.flow import Flow
 from model.invert_block import InvertBlock
-from utils.gaussians import gaussian_log_density, sample_from_gaussian
-from utils.tensors import squeeze, reverse_squeeze
+from modules.utils.gaussians import gaussian_log_density, sample_from_gaussian
+from modules.utils.tensors import squeeze, reverse_squeeze
 
 
 class FlowBlock(InvertBlock):
     """
     Flow block that performs several flow transformations;
-    To reduce computational and memory resources,
-    squeeze was applied to input tensor in original paper;
-
-    after flow steps, split is applied. # todo: finish description
+    For multiscale architecture, squeeze and split applied
+    to input tensor in original paper (as well as in Real-NVP);
 
     Notes: !!! z and x dimensionality can be different
     due to squeeze and split operations, but for each flow level (that's invertible)
@@ -31,13 +29,16 @@ class FlowBlock(InvertBlock):
     squeeze_factor: int
         channel increase scaling factor
 
+    split: bool
+        split is applied after flow steps, if attr = True
+
     flows: list
-        list of flow modules
+        flow modules
     """
 
     def __init__(
         self,
-        in_ch,
+        in_ch: int,
         n_flows: int,
         coupling_hidden_ch: int = 512,
         squeeze_factor: int = 2,
@@ -47,9 +48,14 @@ class FlowBlock(InvertBlock):
         self.squeeze_factor = squeeze_factor
         self.n_flows = n_flows
         self.split = split
-        self.prior = ZeroConv2d(
-            in_ch=in_ch * squeeze_factor, out_ch=in_ch * squeeze_factor**2
-        )
+        if self.split:
+            self.prior = ZeroConv2d(
+                in_ch=in_ch * squeeze_factor, out_ch=in_ch * squeeze_factor**2
+            )
+        else:
+            self.prior = ZeroConv2d(
+                in_ch=in_ch * squeeze_factor * 2, out_ch=in_ch * 2 * squeeze_factor**2
+            )
 
         self.flows: list[Flow] = []
         for _ in range(n_flows):
