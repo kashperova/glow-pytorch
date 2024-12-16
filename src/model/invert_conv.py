@@ -66,5 +66,5 @@ class InvertConv(InvertBlock):
     def reverse(self, x: Tensor) -> Tensor:
         weights = self.get_weights()
         # since W is an orthogonal matrix, W^(-1) = W.T
-        out = F.conv2d(x, weights.T.unsqueeze(2).unsqueeze(3))
+        out = F.conv2d(x, weights.inverse().unsqueeze(2).unsqueeze(3))
         return out

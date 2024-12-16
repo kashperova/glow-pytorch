@@ -1,4 +1,4 @@
-from typing import Optional, Union
+from typing import Optional
 
 import torch
 from torch import Tensor
@@ -45,6 +45,7 @@ class FlowBlock(InvertBlock):
         split: bool = True,
     ):
         super().__init__()
+        self.in_ch = in_ch
         self.squeeze_factor = squeeze_factor
         self.n_flows = n_flows
         self.split = split
@@ -91,7 +92,7 @@ class FlowBlock(InvertBlock):
     def reverse(
         self,
         out: Tensor,
-        eps: Union[float, Tensor],
+        eps: Tensor,
         reconstruct: Optional[bool] = False,
     ) -> Tensor:
         if reconstruct:
@@ -104,7 +105,7 @@ class FlowBlock(InvertBlock):
         for flow in self.flows[::-1]:
             out = flow.reverse(out)
 
-        return reverse_squeeze(out)
+        return reverse_squeeze(out, factor=self.squeeze_factor)
 
     def __get_prob_density(self, out: Tensor, batch_size: int) -> Tensor:
         mean, log_std = self.prior(out).chunk(2, dim=1)
@@ -112,7 +113,7 @@ class FlowBlock(InvertBlock):
         log_p = log_p.view(batch_size, -1).sum(1)
         return log_p
 
-    def __sampling(self, out: Tensor, eps: float) -> Tensor:
+    def __sampling(self, out: Tensor, eps: Tensor) -> Tensor:
         if self.split:
             mean, log_std = self.prior(out).chunk(2, dim=1)
             z = sample_from_gaussian(eps, mean, log_std)

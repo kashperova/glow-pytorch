@@ -1,3 +1,5 @@
+import torch
+
 from modules.utils.tensors import squeeze
 
 
@@ -46,3 +48,10 @@ class TestFlowBlock:
         assert (
             test_log_det == expected_log_det
         ), f"due to composition, final log det equal to sum of each flow log det"
+
+    def test_log_p(self, flow_block, input_batch):
+        _, _, log_p, _ = flow_block(input_batch)
+
+        assert log_p.ndim == 1, f"expected log_p to be 1D, got {log_p.ndim}D"
+        assert log_p.shape[0] == input_batch.shape[0], "log_p batch size mismatch"
+        assert torch.all(torch.isfinite(log_p)), "log_p contains infinite values"

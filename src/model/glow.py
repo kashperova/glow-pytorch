@@ -31,6 +31,7 @@ class Glow(InvertBlock):
         squeeze_factor: int = 2,
     ):
         super(Glow, self).__init__()
+        self.in_ch = in_ch
         self.n_flows = n_flows
         self.num_blocks = num_blocks
         self.squeeze_factor = squeeze_factor
@@ -76,6 +77,6 @@ class Glow(InvertBlock):
         )
 
         for i, block in enumerate(self.blocks[::-1][1:]):
-            x = block.reverse(out=x, eps=z_list[-(i + 1)], reconstruct=reconstruct)
+            x = block.reverse(out=x, eps=z_list[-(i + 2)], reconstruct=reconstruct)
 
         return x
