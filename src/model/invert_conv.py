@@ -2,10 +2,10 @@ import torch
 from torch import Tensor, nn
 from torch.nn import functional as F
 
-from model.flow_block import FlowBlock
+from model.invert_block import InvertBlock
 
 
-class InvertConv(FlowBlock):
+class InvertConv(InvertBlock):
     """
     invertible conv layer where weights
     are obtained by LU decomposition;
@@ -66,5 +66,5 @@ class InvertConv(FlowBlock):
     def reverse(self, x: Tensor) -> Tensor:
         weights = self.get_weights()
         # since W is an orthogonal matrix, W^(-1) = W.T
-        out = F.conv2d(x, weights.T.unsqueeze(2).unsqueeze(3))
+        out = F.conv2d(x, weights.inverse().unsqueeze(2).unsqueeze(3))
         return out

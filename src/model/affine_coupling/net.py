@@ -7,6 +7,15 @@ class NN(nn.Module):
     """
     Simple neural net for affine coupling layer;
     Returns log scale and translation factor.
+
+    In original paper net had 3 conv layers,
+    where 2 hidden layers have ReLU activation
+    and 512 channels;
+
+    The 1st and last convolutions are 3 × 3,
+    while the center conv is 1 × 1,
+    since both its input and output have a large number of channels,
+    in contrast with the first and last convolution.
     """
 
     def __init__(self, in_ch: int, hidden_ch: int):
