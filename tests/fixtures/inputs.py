@@ -1,7 +1,7 @@
 import pytest
 import torch
-
 from fixtures.config import TestConfig
+
 from modules.utils.sampling import get_z_list
 
 

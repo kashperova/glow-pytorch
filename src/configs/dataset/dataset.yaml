@@ -1,0 +1,15 @@
+_target_: src.modules.dataset.DogsDataset
+root: 0
+transforms:
+  _target_: torchvision.transforms.Compose
+  transforms:
+    - _target_: torchvision.transforms.Resize
+      size: [224, 224]
+
+    - _target_: torchvision.transforms.CenterCrop
+      size: [224, 224]
+
+    - _target_: torchvision.transforms.RandomHorizontalFlip
+      p: 0.2
+
+    - _target_: torchvision.transforms.ToTensor

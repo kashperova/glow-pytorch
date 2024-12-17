@@ -1,4 +1,4 @@
-from torch import nn, Tensor
+from torch import Tensor, nn
 
 from model.affine_coupling.zero_conv import ZeroConv2d
 

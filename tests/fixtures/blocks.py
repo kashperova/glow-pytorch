@@ -1,6 +1,6 @@
 import pytest
-
 from fixtures.config import TestConfig
+
 from model.actnorm import ActNorm
 from model.affine_coupling import AffineCoupling
 from model.flow import Flow

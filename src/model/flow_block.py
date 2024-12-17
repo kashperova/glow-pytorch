@@ -7,7 +7,7 @@ from model.affine_coupling.zero_conv import ZeroConv2d
 from model.flow import Flow
 from model.invert_block import InvertBlock
 from modules.utils.gaussians import gaussian_log_density, sample_from_gaussian
-from modules.utils.tensors import squeeze, reverse_squeeze
+from modules.utils.tensors import reverse_squeeze, squeeze
 
 
 class FlowBlock(InvertBlock):

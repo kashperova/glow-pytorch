@@ -44,4 +44,4 @@ class TestActNorm:
         out, log_det = act_norm(input_batch)
         _, _, h, w = input_batch.shape
         expected = h * w * torch.sum(torch.log(torch.abs(act_norm.scale)))
-        assert log_det == expected, f"log det not equal to expected value."
+        assert log_det == expected, "log det not equal to expected value."

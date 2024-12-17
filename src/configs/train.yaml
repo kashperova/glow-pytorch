@@ -1,0 +1,21 @@
+defaults:
+  - ddp: ddp
+  - model: baseline
+  - dataset: dataset
+  - _self_
+optimizer:
+  _target_: torch.optim.Adam
+  lr: 3e-4
+lr_scheduler:
+  _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
+  mode: min
+  factor: 0.2
+  patience: 1
+  min_lr: 1e-6
+loss_func:
+  _target_: src.utils.losses.glow_loss
+trainer:
+  n_epochs: 100
+  train_test_split: 0.85
+  save_dir: "glow_dogs"
+  seed: 42
