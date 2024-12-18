@@ -1,7 +1,7 @@
 from typing import Optional
 
 import torch
-from torch import Tensor
+from torch import Tensor, nn
 
 from model.affine_coupling.zero_conv import ZeroConv2d
 from model.flow import Flow
@@ -32,8 +32,8 @@ class FlowBlock(InvertBlock):
     split: bool
         split is applied after flow steps, if attr = True
 
-    flows: list
-        flow modules
+    flows: nn.ModuleList
+        flow modules list
     """
 
     def __init__(
@@ -58,7 +58,7 @@ class FlowBlock(InvertBlock):
                 in_ch=in_ch * squeeze_factor * 2, out_ch=in_ch * 2 * squeeze_factor**2
             )
 
-        self.flows: list[Flow] = []
+        self.flows = nn.ModuleList()
         for _ in range(n_flows):
             self.flows.append(
                 Flow(
@@ -74,7 +74,7 @@ class FlowBlock(InvertBlock):
 
         for flow in self.flows:
             out, log_det = flow(out)
-            log_det_jacob += log_det
+            log_det_jacob = log_det_jacob + log_det
 
         if self.split:
             # split out on 2 parts

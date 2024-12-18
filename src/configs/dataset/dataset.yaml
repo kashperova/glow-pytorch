@@ -1,6 +1,6 @@
-_target_: modules.dataset.DogsDataset
+_target_: modules.dataset.dogs.DogsDataset
 root: ./data
-transforms:
+transform:
   _target_: torchvision.transforms.Compose
   transforms:
     - _target_: torchvision.transforms.Resize

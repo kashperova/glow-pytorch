@@ -10,6 +10,7 @@ from tqdm import tqdm
 
 from model.glow import Glow
 from modules.dataset.ddp import DDP
+from modules.utils.tensors import dequantize
 from modules.utils.train import SizedDataset, train_test_split
 
 
@@ -45,6 +46,7 @@ class Trainer:
     def train_epoch(self) -> float:
         train_loss = 0.0
         for images, _ in self.ddp.get_train_loader():
+            images = dequantize(images)
             images = images.to(self.device)
             self.optimizer.zero_grad(set_to_none=True)
             outputs = self.model(images)
@@ -62,6 +64,7 @@ class Trainer:
     def test_epoch(self) -> float:
         test_loss = 0.0
         for images, _ in self.ddp.get_test_loader():
+            images = dequantize(images)
             images = images.to(self.device)
             outputs = self.model(images)
             test_loss += self.loss_func(outputs, images).item()

@@ -30,7 +30,7 @@ class Flow(InvertBlock):
         log_det_jacob = 0
         for layer in self.layers:
             x, log_det = layer(x)
-            log_det_jacob += log_det
+            log_det_jacob = log_det_jacob + log_det
 
         return x, log_det_jacob
 

@@ -13,8 +13,9 @@ lr_scheduler:
   patience: 1
   min_lr: 1e-6
 loss_func:
-  _target_: utils.losses.glow_loss
+  _target_: modules.utils.losses.GlowLoss
 trainer:
+  n_bins: 256
   n_epochs: 100
   train_test_split: 0.85
   save_dir: "glow_dogs"

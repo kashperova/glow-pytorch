@@ -1,7 +1,7 @@
-_target_: modules.dataset.DDP
+_target_: modules.dataset.ddp.DDP
 rank: 0
 world_size: ${world_size:}
-train_batch_size: 16
-test_batch_size: 16
+train_batch_size: 8
+test_batch_size: 8
 pin_memory: false
 num_workers: 0
