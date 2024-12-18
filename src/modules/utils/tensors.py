@@ -2,6 +2,10 @@ import torch
 from torch import Tensor
 
 
+def log_abs(x: Tensor) -> Tensor:
+    return torch.log(torch.abs(x))
+
+
 def squeeze(x: Tensor, factor: int = 2) -> Tensor:
     b_size, ch, height, width = x.shape
     x = x.view(b_size, ch, height // factor, factor, width // factor, factor)

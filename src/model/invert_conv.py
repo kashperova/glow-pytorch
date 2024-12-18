@@ -3,6 +3,7 @@ from torch import Tensor, nn
 from torch.nn import functional as F
 
 from model.invert_block import InvertBlock
+from modules.utils.tensors import log_abs
 
 
 class InvertConv(InvertBlock):
@@ -44,7 +45,7 @@ class InvertConv(InvertBlock):
         self.register_buffer("l_mask", l_mask)
 
         s_diag = torch.diag(ut_matrix)
-        self.s_vector = nn.Parameter(self._log_abs(s_diag + 1e-6))
+        self.s_vector = nn.Parameter(log_abs(s_diag + 1e-6))
         self.register_buffer("s_sign", torch.sign(s_diag))
 
     def get_weights(self) -> Tensor:

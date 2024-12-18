@@ -3,6 +3,7 @@ from torch import Tensor
 
 from model.affine_coupling.net import NN
 from model.invert_block import InvertBlock
+from modules.utils.tensors import log_abs
 
 
 class AffineCoupling(InvertBlock):
@@ -30,7 +31,7 @@ class AffineCoupling(InvertBlock):
         x_a, x_b = x.chunk(2, dim=1)
         log_s, t = self.net(x_b)
         s = torch.exp(log_s)
-        log_det = torch.sum(self._log_abs(s))
+        log_det = torch.sum(log_abs(s))
         y_a = x_a * s + t
         y_b = x_b
         return torch.concat([y_a, y_b], dim=1), log_det
