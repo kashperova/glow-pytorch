@@ -1,4 +1,4 @@
-_target_: src.modules.dataset.DogsDataset
+_target_: modules.dataset.DogsDataset
 root: ./data
 transforms:
   _target_: torchvision.transforms.Compose

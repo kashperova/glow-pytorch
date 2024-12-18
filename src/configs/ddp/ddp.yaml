@@ -1,4 +1,4 @@
-_target_: src.modules.dataset.DDP
+_target_: modules.dataset.DDP
 rank: 0
 world_size: ${world_size:}
 train_batch_size: 16

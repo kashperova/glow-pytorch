@@ -1,4 +1,4 @@
-_target_: src.model.Glow
+_target_: model.Glow
 in_ch: 3
 n_flows: 32
 num_blocks: 4

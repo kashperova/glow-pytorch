@@ -13,7 +13,7 @@ lr_scheduler:
   patience: 1
   min_lr: 1e-6
 loss_func:
-  _target_: src.utils.losses.glow_loss
+  _target_: utils.losses.glow_loss
 trainer:
   n_epochs: 100
   train_test_split: 0.85
