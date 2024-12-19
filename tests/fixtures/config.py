@@ -1,5 +1,6 @@
 import random
 
+import numpy as np
 import pytest
 import torch
 
@@ -16,9 +17,14 @@ class TestConfig:
     coupling_hidden_ch: int = 512
 
 
-@pytest.fixture(autouse=True)
-def set_seed():
+def set_test_seed():
     torch.manual_seed(TestConfig.seed)
     torch.cuda.manual_seed(TestConfig.seed)
     random.seed(TestConfig.seed)
+    np.random.seed(TestConfig.seed)
+
+
+@pytest.fixture(autouse=True)
+def set_seed():
+    set_test_seed()
     yield

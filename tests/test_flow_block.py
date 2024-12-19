@@ -43,10 +43,10 @@ class TestFlowBlock:
         expected_log_det = 0
         for f in flow_block.flows:
             x, log_det = f(x)
-            expected_log_det += log_det
+            expected_log_det = expected_log_det + log_det
 
-        assert (
-            test_log_det == expected_log_det
+        assert torch.equal(
+            test_log_det, expected_log_det
         ), "due to composition, final log det equal to sum of each flow log det"
 
     def test_log_p(self, flow_block, input_batch):

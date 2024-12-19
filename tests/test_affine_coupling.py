@@ -22,4 +22,4 @@ class TestAffineCoupling:
         assert torch.allclose(
             input_batch, out, atol=1e-6
         ), "Identity behavior check failed"
-        assert log_det == 0, "log det ~= zero for identity transformation"
+        assert torch.all(log_det == 0), "log det ~= zero for identity transformation"

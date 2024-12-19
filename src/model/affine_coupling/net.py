@@ -29,13 +29,14 @@ class NN(nn.Module):
             nn.ReLU(inplace=True),
             ZeroConv2d(hidden_ch, in_ch),
         )
-        self.__init_conv(conv1)
-        self.__init_conv(conv2)
+        self.__init_conv()
 
-    @classmethod
-    def __init_conv(cls, conv_layer: nn.Conv2d):
-        conv_layer.weight.data.normal_(0, 0.05)
-        conv_layer.bias.data.zero_()
+    def __init_conv(self):
+        self.net[0].weight.data.normal_(0, 0.05)
+        self.net[0].bias.data.zero_()
+
+        self.net[2].weight.data.normal_(0, 0.05)
+        self.net[2].bias.data.zero_()
 
     def forward(self, x: Tensor) -> tuple[Tensor, Tensor]:
         log_s, t = self.net(x).chunk(2, dim=1)

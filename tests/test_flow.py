@@ -34,8 +34,8 @@ class TestFlow:
         x = input_batch
         for layer in flow.layers:
             x, log_det = layer(x)
-            expected_log_det += log_det
+            expected_log_det = expected_log_det + log_det
 
-        assert (
-            test_log_det == expected_log_det
+        assert torch.equal(
+            test_log_det, expected_log_det
         ), "due to composition, final log det equal to sum of flow step components log det"

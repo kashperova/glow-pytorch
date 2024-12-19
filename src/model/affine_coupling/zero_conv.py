@@ -24,5 +24,5 @@ class ZeroConv2d(nn.Module):
         # padding to not change shape
         out = F.pad(x, [1, 1, 1, 1], value=1)
         out = self.conv(out)
-        out = out * torch.exp(self.scale * 2)
+        out = out * torch.exp(self.scale * 3)
         return out

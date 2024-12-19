@@ -11,7 +11,7 @@ class TestGlow:
             isinstance(z, Tensor) for z in z_list
         ), "all z_list elements should be tensors"
         assert len(z_list) == glow.num_blocks, "len(z_list) != num_blocks"
-        assert log_det_jacob != 0.0, "log_det_jacob should be not zero"
+        assert torch.any(log_det_jacob), "log_det_jacob should be not zero"
 
     def test_reconstruct(self, glow, input_batch):
         z_list, _, _ = glow(input_batch)

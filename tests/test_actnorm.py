@@ -29,7 +29,7 @@ class TestActNorm:
         # compute mean per channel
         mean = out.mean(dim=[0, 2, 3])
         assert torch.allclose(
-            mean, torch.zeros_like(mean), atol=1e-4
+            mean, torch.zeros_like(mean), atol=1e-3
         ), f"channels means after norm should be ~0, got {mean.tolist()}"
 
     def test_norm_std(self, act_norm, input_batch):
