@@ -79,12 +79,16 @@ class FlowBlock(InvertBlock):
         if self.split:
             # split out on 2 parts
             out, z_new = out.chunk(2, dim=1)
-            log_p = self.__get_prob_density(out, batch_size)
+            log_p = self.__get_prob_density(
+                prior_out=out, out=out, batch_size=batch_size
+            )
         else:
             # for the last level prior distribution
             # is standard gaussian (mean=0, std=1)
             zero = torch.zeros_like(out)
-            log_p = self.__get_prob_density(zero, batch_size)
+            log_p = self.__get_prob_density(
+                prior_out=zero, out=out, batch_size=batch_size
+            )
             z_new = out
 
         return out, log_det_jacob, log_p, z_new
@@ -107,8 +111,10 @@ class FlowBlock(InvertBlock):
 
         return reverse_squeeze(out, factor=self.squeeze_factor)
 
-    def __get_prob_density(self, out: Tensor, batch_size: int) -> Tensor:
-        mean, log_std = self.prior(out).chunk(2, dim=1)
+    def __get_prob_density(
+        self, prior_out: Tensor, out: Tensor, batch_size: int
+    ) -> Tensor:
+        mean, log_std = self.prior(prior_out).chunk(2, dim=1)
         log_p = gaussian_log_density(out, mean=mean, log_std=log_std)
         log_p = log_p.view(batch_size, -1).sum(1)
         return log_p

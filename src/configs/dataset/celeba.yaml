@@ -1,18 +1,14 @@
 _target_: modules.dataset.celeba.CelebaDataset
-root: ./data
-train_batch_size: 16
-test_batch_size: 16
-image_size: 64
+root: ./data/img_align_celeba
 transform:
   _target_: torchvision.transforms.Compose
   transforms:
     - _target_: torchvision.transforms.Resize
-      size: [${image_size}, ${image_size}]
+      size: [64, 64]
 
     - _target_: torchvision.transforms.CenterCrop
-      size: [${image_size}, ${image_size}]
+      size: [64, 64]
 
     - _target_: torchvision.transforms.RandomHorizontalFlip
-      p: 0.2
 
     - _target_: torchvision.transforms.ToTensor

@@ -28,7 +28,7 @@ def train(cfg: DictConfig):
     optimizer = instantiate(cfg.optimizer, params=trainable_params)
     lr_scheduler = instantiate(cfg.lr_scheduler, optimizer=optimizer)
 
-    trainer_cls = Trainer if cfg.trainer.use_ddp else DDPTrainer
+    trainer_cls = DDPTrainer if cfg.trainer.use_ddp else Trainer
 
     trainer = trainer_cls(
         model=model,

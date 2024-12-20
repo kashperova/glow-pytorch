@@ -35,7 +35,6 @@ class Trainer:
 
         self.config = config
         self.train_config = config.trainer
-        self.data_config = config.dataset
 
         self.train_dataset, self.test_dataset = train_test_split(
             dataset, self.train_config.train_test_split
@@ -45,16 +44,17 @@ class Trainer:
 
         self.z_list = get_z_list(
             glow=self.model,
-            image_height=self.data_config.image_size,
-            image_width=self.data_config.image_size,
+            image_height=self.train_config.image_size,
+            image_width=self.train_config.image_size,
             batch_size=self.train_config.n_samples,
         )
 
         self.z_list = [z_i.to(self.device) for z_i in self.z_list]
 
     def train_epoch(self) -> float:
+        self.model.train()
         run_train_loss = 0.0
-        for i, (images, _) in enumerate(self.train_loader):
+        for i, images in enumerate(self.train_loader):
             images = dequantize(images)
             images = images.to(self.device)
             self.optimizer.zero_grad()
@@ -71,6 +71,7 @@ class Trainer:
 
     @torch.inference_mode()
     def test_epoch(self) -> float:
+        self.model.eval()
         run_test_loss = 0.0
         for images, _ in self.test_loader:
             images = dequantize(images)
@@ -83,21 +84,24 @@ class Trainer:
     def train(self):
         self.train_loader = DataLoader(
             self.train_dataset,
-            batch_size=self.data_config.batch_size,
+            batch_size=self.train_config.train_batch_size,
             num_workers=4,
             shuffle=True,
         )
         self.test_loader = DataLoader(
-            self.test_dataset, batch_size=self.data_config.batch_size, num_workers=4
+            self.test_dataset,
+            batch_size=self.train_config.test_batch_size,
+            num_workers=4,
         )
 
         self.model = nn.DataParallel(self.model).to(self.device)
 
         with torch.no_grad():
             images = dequantize(next(iter(self.test_loader)))
+            images = images.to(self.device)
             self.model.module(images)
 
-        for i in tqdm(range(self.train_config.epochs)):
+        for i in tqdm(range(self.train_config.n_epochs)):
             train_loss = self.train_epoch()
             train_loss /= len(self.train_dataset)
 
@@ -122,7 +126,7 @@ class Trainer:
             os.makedirs(self.train_config.samples_dir)
 
         utils.save_image(
-            self.model.reverse(self.z_list).cpu().data,
+            self.model.module.reverse(self.z_list).cpu().data,
             f"{self.train_config.samples_dir}/{label}.png",
             normalize=True,
             nrow=10,

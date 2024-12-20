@@ -18,6 +18,9 @@ trainer:
   n_bins: 32
   n_epochs: 2
   train_test_split: 0.85
+  train_batch_size: 16
+  test_batch_size: 16
+  image_size: 64
   log_steps: 10
   sampling_iters: 30
   n_samples: 10

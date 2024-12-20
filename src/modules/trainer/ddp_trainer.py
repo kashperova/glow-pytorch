@@ -10,7 +10,7 @@ from tqdm import tqdm
 
 from model.glow import Glow
 from modules.dataset.ddp import DDP
-from modules.trainer import Trainer
+from modules.trainer.trainer import Trainer
 from modules.utils.train import SizedDataset
 
 
