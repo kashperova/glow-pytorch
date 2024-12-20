@@ -65,6 +65,5 @@ class DDPTrainer(Trainer):
 
             for i in tqdm(range(self.train_config.epochs)):
                 self.ddp.set_train_epoch(i)
-                train_loss = self.train_epoch()
-                test_loss = self.test_epoch()
-                print(f"Train loss: {train_loss}, Test loss: {test_loss}", flush=True)
+                self.train_epoch()
+                self.test_epoch()

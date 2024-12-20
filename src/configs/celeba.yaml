@@ -15,6 +15,7 @@ lr_scheduler:
 loss_func:
   _target_: modules.utils.losses.GlowLoss
 trainer:
+  run_name: baseline
   n_bins: 32
   n_epochs: 2
   train_test_split: 0.85
@@ -22,7 +23,8 @@ trainer:
   test_batch_size: 16
   image_size: 64
   log_steps: 10
-  sampling_iters: 30
+  log_dir: ./runs
+  sampling_steps: 10
   n_samples: 10
   samples_dir: samples
   save_dir: glow

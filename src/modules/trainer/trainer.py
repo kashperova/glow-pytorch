@@ -1,8 +1,9 @@
-import os
+import logging
 from typing import Callable
 
 import torch
 from omegaconf import DictConfig
+from PIL import Image
 from torch import nn
 from torch.optim import Optimizer
 from torch.optim.lr_scheduler import LRScheduler
@@ -11,9 +12,13 @@ from torchvision import utils
 from tqdm import tqdm
 
 from model.glow import Glow
+from modules.logger import TensorboardLogger
 from modules.utils.sampling import get_z_list
 from modules.utils.tensors import dequantize
 from modules.utils.train import SizedDataset, train_test_split
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 class Trainer:
@@ -41,6 +46,11 @@ class Trainer:
         )
         self.train_loader = None
         self.test_loader = None
+        self.logger = TensorboardLogger(
+            log_dir=self.train_config.log_dir,
+            run_name=self.train_config.run_name,
+            log_steps=self.train_config.log_steps,
+        )
 
         self.z_list = get_z_list(
             glow=self.model,
@@ -53,7 +63,7 @@ class Trainer:
 
     def train_epoch(self) -> float:
         self.model.train()
-        run_train_loss = 0.0
+        run_train_loss, n_iters = 0.0, 0
         for i, images in enumerate(self.train_loader):
             images = dequantize(images)
             images = images.to(self.device)
@@ -63,9 +73,11 @@ class Trainer:
             loss.backward()
             self.optimizer.step()
             run_train_loss += loss.item()
+            n_iters += 1
 
-            if i % self.train_config.sampling_iters == 0:
-                self.save_sample(label=f"iter_{i}")
+            if i % self.train_config.sampling_steps == 0:
+                self.log_samples()
+                logger.info(f"Train avg loss: {run_train_loss / n_iters}")
 
         return run_train_loss
 
@@ -120,15 +132,19 @@ class Trainer:
         )
 
     @torch.inference_mode()
-    def save_sample(self, label: str):
-        # todo: change to logging (tensorboard)
-        if not os.path.exists(self.train_config.samples_dir):
-            os.makedirs(self.train_config.samples_dir)
+    def log_samples(self, step: int, save_png: bool = True):
+        data = self.model.module.reverse(self.z_list).cpu().data
+        grid = utils.make_grid(data, nrow=10, normalize=True, value_range=(-0.5, 0.5))
+        self.logger.log_images(grid=grid, step=step)
 
-        utils.save_image(
-            self.model.module.reverse(self.z_list).cpu().data,
-            f"{self.train_config.samples_dir}/{label}.png",
-            normalize=True,
-            nrow=10,
-            value_range=(-0.5, 0.5),
-        )
+        if save_png:
+            np_array = (
+                grid.mul(255)
+                .add_(0.5)
+                .clamp_(0, 255)
+                .permute(1, 2, 0)
+                .to("cpu", torch.uint8)
+                .numpy()
+            )
+            im = Image.fromarray(np_array)
+            im.save(f"{self.train_config.samples_dir}/{step}.png")
