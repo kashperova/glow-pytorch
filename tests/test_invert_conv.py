@@ -29,5 +29,5 @@ class TestInvertConv:
         _, _ = invert_conv(input_batch)
         reconstructed = invert_conv.get_weights()
         assert torch.allclose(
-            weights, reconstructed, atol=1e-3
+            weights, reconstructed, atol=1e-4
         ), "weights after LU decomposition is not equal to expected value."
