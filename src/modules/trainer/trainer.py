@@ -1,4 +1,5 @@
 import logging
+import os
 from typing import Callable
 
 import torch
@@ -138,6 +139,9 @@ class Trainer:
         self.logger.log_images(grid=grid, step=step)
 
         if save_png:
+            if not os.path.exists(self.train_config.samples_dir):
+                os.makedirs(self.train_config.samples_dir)
+
             np_array = (
                 grid.mul(255)
                 .add_(0.5)
