@@ -1,7 +1,5 @@
-import numpy as np
 import torch
-from fixtures.config import TestConfig, set_test_seed
-from scipy import linalg
+from fixtures.config import TestConfig
 
 
 class TestInvertConv:
@@ -26,11 +24,8 @@ class TestInvertConv:
         ), "log det not equal to expected value."
 
     def test_get_weights(self, invert_conv, input_batch):
-        set_test_seed()
-        weights = np.random.randn(TestConfig.in_ch, TestConfig.in_ch)
-        q, _ = linalg.qr(weights)
-        weights = q.astype(np.float32)
-        weights = torch.from_numpy(weights)
+        torch.manual_seed(TestConfig.seed)
+        weights = torch.linalg.qr(torch.rand(TestConfig.in_ch, TestConfig.in_ch))[0]
         _, _ = invert_conv(input_batch)
         reconstructed = invert_conv.get_weights()
         assert torch.allclose(

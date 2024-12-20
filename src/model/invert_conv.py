@@ -1,6 +1,4 @@
-import numpy as np
 import torch
-from scipy import linalg
 from torch import Tensor, nn
 from torch.nn import functional as F
 
@@ -31,14 +29,8 @@ class InvertConv(InvertBlock):
 
     def __init__(self, in_ch: int):
         super().__init__()
-        weight_matrix = np.random.randn(in_ch, in_ch)
-        q, _ = linalg.qr(weight_matrix)
-        perm_matrix, lt_matrix, ut_matrix = linalg.lu(q.astype(np.float32))
-
-        perm_matrix = torch.from_numpy(perm_matrix)
-        lt_matrix = torch.from_numpy(lt_matrix)
-        ut_matrix = torch.from_numpy(ut_matrix)
-
+        weight_matrix = torch.linalg.qr(torch.rand(in_ch, in_ch))[0]
+        perm_matrix, lt_matrix, ut_matrix = torch.linalg.lu(weight_matrix)
         self.register_buffer("perm_matrix", perm_matrix)
 
         self.ut_matrix = nn.Parameter(ut_matrix.triu(1))
@@ -63,7 +55,6 @@ class InvertConv(InvertBlock):
             self.s_sign * torch.exp(self.s_vector)
         )
         weights = self.perm_matrix @ l_matrix @ u_matrix
-
         return weights
 
     def forward(self, x: Tensor) -> tuple[Tensor, Tensor]:
