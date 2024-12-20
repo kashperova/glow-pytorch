@@ -1,13 +1,13 @@
 from typing import Optional
 
 import torch
-from torch import Tensor
+from torch import Tensor, nn
 
 from model.affine_coupling.zero_conv import ZeroConv2d
 from model.flow import Flow
 from model.invert_block import InvertBlock
 from modules.utils.gaussians import gaussian_log_density, sample_from_gaussian
-from modules.utils.tensors import squeeze, reverse_squeeze
+from modules.utils.tensors import reverse_squeeze, squeeze
 
 
 class FlowBlock(InvertBlock):
@@ -32,8 +32,8 @@ class FlowBlock(InvertBlock):
     split: bool
         split is applied after flow steps, if attr = True
 
-    flows: list
-        flow modules
+    flows: nn.ModuleList
+        flow modules list
     """
 
     def __init__(
@@ -58,7 +58,7 @@ class FlowBlock(InvertBlock):
                 in_ch=in_ch * squeeze_factor * 2, out_ch=in_ch * 2 * squeeze_factor**2
             )
 
-        self.flows: list[Flow] = []
+        self.flows = nn.ModuleList()
         for _ in range(n_flows):
             self.flows.append(
                 Flow(
@@ -74,17 +74,21 @@ class FlowBlock(InvertBlock):
 
         for flow in self.flows:
             out, log_det = flow(out)
-            log_det_jacob += log_det
+            log_det_jacob = log_det_jacob + log_det
 
         if self.split:
             # split out on 2 parts
             out, z_new = out.chunk(2, dim=1)
-            log_p = self.__get_prob_density(out, batch_size)
+            log_p = self.__get_prob_density(
+                prior_out=out, out=out, batch_size=batch_size
+            )
         else:
             # for the last level prior distribution
             # is standard gaussian (mean=0, std=1)
             zero = torch.zeros_like(out)
-            log_p = self.__get_prob_density(zero, batch_size)
+            log_p = self.__get_prob_density(
+                prior_out=zero, out=out, batch_size=batch_size
+            )
             z_new = out
 
         return out, log_det_jacob, log_p, z_new
@@ -107,8 +111,10 @@ class FlowBlock(InvertBlock):
 
         return reverse_squeeze(out, factor=self.squeeze_factor)
 
-    def __get_prob_density(self, out: Tensor, batch_size: int) -> Tensor:
-        mean, log_std = self.prior(out).chunk(2, dim=1)
+    def __get_prob_density(
+        self, prior_out: Tensor, out: Tensor, batch_size: int
+    ) -> Tensor:
+        mean, log_std = self.prior(prior_out).chunk(2, dim=1)
         log_p = gaussian_log_density(out, mean=mean, log_std=log_std)
         log_p = log_p.view(batch_size, -1).sum(1)
         return log_p

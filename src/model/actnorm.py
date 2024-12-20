@@ -1,7 +1,8 @@
 import torch
-from torch import nn, Tensor
+from torch import Tensor, nn
 
 from model.invert_block import InvertBlock
+from modules.utils.tensors import log_abs
 
 
 class ActNorm(InvertBlock):
@@ -40,7 +41,7 @@ class ActNorm(InvertBlock):
             self.__init_params(x)
 
         _, _, h, w = x.shape
-        log_det = h * w * torch.sum(self._log_abs(self.scale))
+        log_det = h * w * torch.sum(log_abs(self.scale))
 
         return x * self.scale + self.bias, log_det
 

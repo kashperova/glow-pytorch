@@ -1,4 +1,5 @@
 import torch
+from fixtures.config import TestConfig
 
 
 class TestActNorm:
@@ -25,6 +26,7 @@ class TestActNorm:
         ), "batch after reverse != input batch."
 
     def test_norm_mean(self, act_norm, input_batch):
+        torch.manual_seed(TestConfig.seed)
         out, _ = act_norm(input_batch)
         # compute mean per channel
         mean = out.mean(dim=[0, 2, 3])
@@ -33,6 +35,7 @@ class TestActNorm:
         ), f"channels means after norm should be ~0, got {mean.tolist()}"
 
     def test_norm_std(self, act_norm, input_batch):
+        torch.manual_seed(TestConfig.seed)
         out, _ = act_norm(input_batch)
         # compute std per channel
         std = out.std(dim=[0, 2, 3])
@@ -44,4 +47,4 @@ class TestActNorm:
         out, log_det = act_norm(input_batch)
         _, _, h, w = input_batch.shape
         expected = h * w * torch.sum(torch.log(torch.abs(act_norm.scale)))
-        assert log_det == expected, f"log det not equal to expected value."
+        assert log_det == expected, "log det not equal to expected value."

@@ -1,0 +1,30 @@
+defaults:
+  - ddp: ddp
+  - model: baseline
+  - dataset: celeba
+  - _self_
+optimizer:
+  _target_: torch.optim.Adam
+  lr: 2e-4
+lr_scheduler:
+  _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
+  mode: min
+  factor: 0.2
+  patience: 1
+  min_lr: 1e-6
+loss_func:
+  _target_: modules.utils.losses.GlowLoss
+trainer:
+  n_bins: 32
+  n_epochs: 2
+  train_test_split: 0.85
+  train_batch_size: 16
+  test_batch_size: 16
+  image_size: 64
+  log_steps: 10
+  sampling_iters: 30
+  n_samples: 10
+  samples_dir: samples
+  save_dir: glow
+  seed: 42
+  use_ddp: false

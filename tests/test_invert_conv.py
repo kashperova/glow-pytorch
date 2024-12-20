@@ -1,5 +1,4 @@
 import torch
-
 from fixtures.config import TestConfig
 
 
@@ -22,7 +21,7 @@ class TestInvertConv:
         expected = h * w * torch.log(torch.det(weights))
         assert torch.allclose(
             log_det, expected, atol=1e-4
-        ), f"log det not equal to expected value."
+        ), "log det not equal to expected value."
 
     def test_get_weights(self, invert_conv, input_batch):
         torch.manual_seed(TestConfig.seed)
@@ -31,4 +30,4 @@ class TestInvertConv:
         reconstructed = invert_conv.get_weights()
         assert torch.allclose(
             weights, reconstructed, atol=1e-4
-        ), f"weights after LU decomposition is not equal to expected value."
+        ), "weights after LU decomposition is not equal to expected value."

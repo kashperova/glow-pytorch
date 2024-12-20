@@ -1,4 +1,4 @@
-from torch import Tensor
+from torch import Tensor, nn
 
 from model.flow_block import FlowBlock
 from model.invert_block import InvertBlock
@@ -35,7 +35,7 @@ class Glow(InvertBlock):
         self.n_flows = n_flows
         self.num_blocks = num_blocks
         self.squeeze_factor = squeeze_factor
-        self.blocks: list[FlowBlock] = []
+        self.blocks = nn.ModuleList()
 
         for _ in range(self.num_blocks - 1):
             self.blocks.append(
@@ -59,13 +59,13 @@ class Glow(InvertBlock):
         )
 
     def forward(self, x: Tensor) -> tuple[list[Tensor], float, float]:
-        log_det_jacob = 0.0
-        log_p_total = 0.0
+        log_det_jacob = 0
+        log_p_total = 0
         z_list = []
         for block in self.blocks:
             x, log_det, log_p, z_new = block(x)
-            log_det_jacob += log_det
-            log_p_total += log_p
+            log_det_jacob = log_det_jacob + log_det
+            log_p_total = log_p_total + log_p
             z_list.append(z_new)
 
         return z_list, log_det_jacob, log_p_total

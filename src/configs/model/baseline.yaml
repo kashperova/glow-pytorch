@@ -1,0 +1,6 @@
+_target_: model.glow.Glow
+in_ch: 3
+n_flows: 32
+num_blocks: 4
+coupling_hidden_ch: 512
+squeeze_factor: 2

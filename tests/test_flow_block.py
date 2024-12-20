@@ -14,27 +14,27 @@ class TestFlowBlock:
 
         # test last flow block (w/o split)
         out, _, _, _ = last_flow_block(input_batch)
-        assert out.shape == squeezed.shape, f"out shape != input squeezed shape"
+        assert out.shape == squeezed.shape, "out shape != input squeezed shape"
 
     def test_reconstruct(self, flow_block, last_flow_block, input_batch):
         out, _, _, _ = flow_block(input_batch)
         x = flow_block.reverse(out, eps=out, reconstruct=True)
-        assert x.shape == input_batch.shape, f"reconstructed shape != input shape"
+        assert x.shape == input_batch.shape, "reconstructed shape != input shape"
 
         # test last flow block (w/o split)
         out, _, _, _ = last_flow_block(input_batch)
         x = last_flow_block.reverse(out, eps=out, reconstruct=True)
-        assert x.shape == input_batch.shape, f"reconstructed shape != input shape"
+        assert x.shape == input_batch.shape, "reconstructed shape != input shape"
 
     def test_sampling(self, flow_block, last_flow_block, input_batch):
         out, _, _, _ = flow_block(input_batch)
         s = flow_block.reverse(out, eps=out, reconstruct=False)
-        assert s.shape == input_batch.shape, f"sampled shape != input shape"
+        assert s.shape == input_batch.shape, "sampled shape != input shape"
 
         # test last flow block (w/o split)
         out, _, _, _ = last_flow_block(input_batch)
         s = last_flow_block.reverse(out, eps=out, reconstruct=False)
-        assert s.shape == input_batch.shape, f"sampled shape != input shape"
+        assert s.shape == input_batch.shape, "sampled shape != input shape"
 
     def test_log_det(self, flow_block, last_flow_block, input_batch):
         out, test_log_det, log_p, z_new = flow_block(input_batch)
@@ -43,11 +43,11 @@ class TestFlowBlock:
         expected_log_det = 0
         for f in flow_block.flows:
             x, log_det = f(x)
-            expected_log_det += log_det
+            expected_log_det = expected_log_det + log_det
 
-        assert (
-            test_log_det == expected_log_det
-        ), f"due to composition, final log det equal to sum of each flow log det"
+        assert torch.equal(
+            test_log_det, expected_log_det
+        ), "due to composition, final log det equal to sum of each flow log det"
 
     def test_log_p(self, flow_block, input_batch):
         _, _, log_p, _ = flow_block(input_batch)
