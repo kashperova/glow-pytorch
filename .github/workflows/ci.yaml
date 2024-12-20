@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main]
+#    branches: [main]
   pull_request:
 
 jobs:
@@ -37,4 +37,4 @@ jobs:
         run: poetry run pytest -vv
 
       - name: pre-commit checks
-        run: pre-commit run --all-files
+        uses:  pre-commit/action@v3.0.1
