@@ -13,6 +13,10 @@ class InvertConv(InvertBlock):
     so determinant's calculation has not cubic,
     but linear complexity.
 
+    having fixed the P, we restrict some class of all transformations;
+    having achieved that the elements on the L & U diagonal will be positive
+    we will be sure that the weights matrix is invertible
+
     attrs (trainable)
     ----------
     ut_matrix: nn.Parameter

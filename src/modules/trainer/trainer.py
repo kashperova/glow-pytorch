@@ -62,7 +62,7 @@ class Trainer:
 
         self.z_list = [z_i.to(self.device) for z_i in self.z_list]
 
-    def train_epoch(self) -> float:
+    def train_epoch(self, epoch: int) -> float:
         self.model.train()
         run_train_loss, n_iters = 0.0, 0
         for i, images in enumerate(self.train_loader):
@@ -77,9 +77,9 @@ class Trainer:
             n_iters += 1
 
             if i % self.train_config.sampling_steps == 0 and i != 0:
-                self.log_samples(step=i)
+                self.log_samples(step=epoch + i)
                 avg_loss = run_train_loss / n_iters
-                self.logger.log_train_loss(loss=avg_loss, step=i)
+                self.logger.log_train_loss(loss=avg_loss, step=epoch + i)
                 logger.info(f"Train avg loss: {avg_loss}")
 
         return run_train_loss
@@ -119,27 +119,20 @@ class Trainer:
             self.model.module(images)
 
         for i in tqdm(range(self.train_config.n_epochs)):
-            train_loss = self.train_epoch()
+            train_loss = self.train_epoch(1)
             train_loss /= len(self.train_dataset)
 
             test_loss = self.test_epoch()
             test_loss /= len(self.test_dataset)
-            try:
-                self.logger.log_test_loss(loss=test_loss, epoch=i)
-                self.lr_scheduler.step(test_loss)
-            except Exception as ex:
-                print(f"Exception during lr scheduler step: {ex}")
-                torch.save(self.model.state_dict(), f"model_{i}.pt")
-                torch.save(
-                    self.optimizer.state_dict(),
-                    f"optimizer_{i}.pt",
-                )
+
+            self.logger.log_test_loss(loss=test_loss, epoch=i + 1)
+            self.lr_scheduler.step(test_loss)
 
             self.save_checkpoint(epoch=i)
 
     def save_checkpoint(self, epoch: int):
         if not os.path.exists(self.train_config.save_dir):
-            os.makedirs(self.train_config.save_dir)
+            os.makedirs(self.train_config.save_dir, exist_ok=True)
 
         torch.save(
             self.model.state_dict(), f"{self.train_config.save_dir}/model_{epoch}.pt"

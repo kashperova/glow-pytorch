@@ -54,7 +54,7 @@ def last_flow_block():
     )
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="session")
 def glow():
     return Glow(
         in_ch=TestConfig.in_ch,
