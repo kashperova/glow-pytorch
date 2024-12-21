@@ -6,9 +6,9 @@ from model.invert_conv import InvertConv
 
 
 class TestFlow:
-    def test_forward(self, flow, input_batch):
-        out, _ = flow(input_batch)
-        assert out.shape == input_batch.shape, "out shape != input shape"
+    def test_forward(self, flow, flow_input_batch):
+        out, _ = flow(flow_input_batch)
+        assert out.shape == flow_input_batch.shape, "out shape != input shape"
         assert len(flow.layers) == 3, "flow block contains 3 layers"
         assert isinstance(flow.layers[0], ActNorm), "act norm should be the 1st layer"
         assert isinstance(
@@ -18,20 +18,22 @@ class TestFlow:
             flow.layers[2], AffineCoupling
         ), "coupling should be the last layer"
 
-    def test_reverse(self, flow, input_batch):
-        out, _ = flow(input_batch)
+    def test_reverse(self, flow, flow_input_batch):
+        out, _ = flow(flow_input_batch)
         reverse_out = flow.reverse(out)
 
-        assert reverse_out.shape == input_batch.shape, "reverse shape != input shape"
+        assert (
+            reverse_out.shape == flow_input_batch.shape
+        ), "reverse shape != input shape"
         assert torch.allclose(
-            input_batch, reverse_out, atol=1e-5
+            flow_input_batch, reverse_out, atol=1e-5
         ), "batch after reverse != input batch."
 
-    def test_log_det(self, flow, input_batch):
-        out, test_log_det = flow(input_batch)
+    def test_log_det(self, flow, flow_input_batch):
+        out, test_log_det = flow(flow_input_batch)
 
         expected_log_det = 0
-        x = input_batch
+        x = flow_input_batch
         for layer in flow.layers:
             x, log_det = layer(x)
             expected_log_det = expected_log_det + log_det

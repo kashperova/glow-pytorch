@@ -15,6 +15,16 @@ def input_batch():
     )
 
 
+@pytest.fixture(scope="module")
+def flow_input_batch():
+    return torch.randn(
+        TestConfig.batch_size,
+        TestConfig.in_ch * 2,
+        TestConfig.image_size // 2,
+        TestConfig.image_size // 2,
+    )
+
+
 @pytest.fixture(scope="function")
 def z_sample(glow):
     return get_z_list(

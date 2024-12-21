@@ -1,5 +1,6 @@
 import torch
 from torch import Tensor
+from torch.nn import functional as F
 
 from model.affine_coupling.net import NN
 from model.invert_block import InvertBlock
@@ -23,22 +24,22 @@ class AffineCoupling(InvertBlock):
     """
 
     def __init__(self, in_ch: int, hidden_ch: int):
-        super(AffineCoupling, self).__init__()
+        super().__init__()
         self.net = NN(in_ch, hidden_ch)
 
     def forward(self, x: Tensor) -> tuple[Tensor, Tensor]:
         x_a, x_b = x.chunk(2, dim=1)
-        log_s, t = self.net(x_b)
-        s = torch.exp(log_s)
+        log_s, t = self.net(x_a)
+        s = F.sigmoid(log_s + 2)
         log_det = torch.sum(torch.log(s).view(x.shape[0], -1), 1)
-        y_a = x_a * s + t
-        y_b = x_b
+        y_b = (x_b + t) * s
+        y_a = x_a
         return torch.concat([y_a, y_b], dim=1), log_det
 
     def reverse(self, y: Tensor) -> Tensor:
         y_a, y_b = y.chunk(2, dim=1)
-        log_s, t = self.net(y_b)
-        s = torch.exp(log_s)
-        x_a = (y_a - t) / s
-        x_b = y_b
+        log_s, t = self.net(y_a)
+        s = F.sigmoid(log_s + 2)
+        x_b = y_b / s - t
+        x_a = y_a
         return torch.concat([x_a, x_b], dim=1)

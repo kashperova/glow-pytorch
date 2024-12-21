@@ -80,7 +80,7 @@ class FlowBlock(InvertBlock):
             # split out on 2 parts
             out, z_new = out.chunk(2, dim=1)
             log_p = self.__get_prob_density(
-                prior_out=out, out=out, batch_size=batch_size
+                prior_out=out, out=z_new, batch_size=batch_size
             )
         else:
             # for the last level prior distribution

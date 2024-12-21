@@ -22,14 +22,14 @@ def invert_conv():
 @pytest.fixture(scope="function")
 def affine_coupling():
     return AffineCoupling(
-        in_ch=TestConfig.in_ch, hidden_ch=TestConfig.coupling_hidden_ch
+        in_ch=TestConfig.in_ch * 2, hidden_ch=TestConfig.coupling_hidden_ch
     )
 
 
 @pytest.fixture(scope="function")
 def flow():
     return Flow(
-        in_ch=TestConfig.in_ch, coupling_hidden_ch=TestConfig.coupling_hidden_ch
+        in_ch=TestConfig.in_ch * 2, coupling_hidden_ch=TestConfig.coupling_hidden_ch
     )
 
 
@@ -54,7 +54,7 @@ def last_flow_block():
     )
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="session")
 def glow():
     return Glow(
         in_ch=TestConfig.in_ch,

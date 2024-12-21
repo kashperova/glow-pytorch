@@ -5,7 +5,7 @@ defaults:
   - _self_
 optimizer:
   _target_: torch.optim.Adam
-  lr: 2e-4
+  lr: 1e-4
 lr_scheduler:
   _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
   mode: min
@@ -15,16 +15,18 @@ lr_scheduler:
 loss_func:
   _target_: modules.utils.losses.GlowLoss
 trainer:
+  run_name: baseline
   n_bins: 32
   n_epochs: 2
   train_test_split: 0.85
   train_batch_size: 16
   test_batch_size: 16
   image_size: 64
-  log_steps: 10
-  sampling_iters: 30
+  log_steps: 50
+  log_dir: ./runs
+  sampling_steps: 50
   n_samples: 10
   samples_dir: samples
-  save_dir: glow
+  save_dir: ./glow
   seed: 42
   use_ddp: false

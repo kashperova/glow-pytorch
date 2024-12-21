@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from torch import Tensor, nn
 
 from model.flow_block import FlowBlock
@@ -30,8 +32,8 @@ class Glow(InvertBlock):
         coupling_hidden_ch: int = 512,
         squeeze_factor: int = 2,
     ):
-        super(Glow, self).__init__()
-        self.in_ch = in_ch
+        super().__init__()
+        self.in_ch = deepcopy(in_ch)
         self.n_flows = n_flows
         self.num_blocks = num_blocks
         self.squeeze_factor = squeeze_factor
