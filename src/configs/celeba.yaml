@@ -5,7 +5,7 @@ defaults:
   - _self_
 optimizer:
   _target_: torch.optim.Adam
-  lr: 2e-4
+  lr: 1e-4
 lr_scheduler:
   _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
   mode: min
@@ -27,6 +27,6 @@ trainer:
   sampling_steps: 50
   n_samples: 10
   samples_dir: samples
-  save_dir: glow
+  save_dir: ./glow
   seed: 42
   use_ddp: false

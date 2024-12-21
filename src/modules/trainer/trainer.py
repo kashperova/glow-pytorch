@@ -88,7 +88,7 @@ class Trainer:
     def test_epoch(self) -> float:
         self.model.eval()
         run_test_loss = 0.0
-        for images, _ in self.test_loader:
+        for images in self.test_loader:
             images = dequantize(images, self.train_config.n_bins)
             images = images.to(self.device)
             outputs = self.model(images)
@@ -124,10 +124,23 @@ class Trainer:
 
             test_loss = self.test_epoch()
             test_loss /= len(self.test_dataset)
+            try:
+                self.logger.log_test_loss(loss=test_loss, epoch=i)
+                self.lr_scheduler.step(test_loss)
+            except Exception as ex:
+                print(f"Exception during lr scheduler step: {ex}")
+                torch.save(self.model.state_dict(), f"model_{i}.pt")
+                torch.save(
+                    self.optimizer.state_dict(),
+                    f"optimizer_{i}.pt",
+                )
 
             self.save_checkpoint(epoch=i)
 
     def save_checkpoint(self, epoch: int):
+        if not os.path.exists(self.train_config.save_dir):
+            os.makedirs(self.train_config.save_dir)
+
         torch.save(
             self.model.state_dict(), f"{self.train_config.save_dir}/model_{epoch}.pt"
         )
@@ -139,7 +152,7 @@ class Trainer:
     @torch.inference_mode()
     def log_samples(self, step: int, save_png: bool = True):
         data = self.model.module.reverse(self.z_list).cpu().data
-        grid = utils.make_grid(data, nrow=10, normalize=True, value_range=(-0.5, 0.5))
+        grid = utils.make_grid(data, nrow=5, normalize=True, value_range=(-0.5, 0.5))
         self.logger.log_images(grid=grid, step=step)
 
         if save_png:

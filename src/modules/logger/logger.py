@@ -23,5 +23,8 @@ class TensorboardLogger:
         if step % self.log_steps == 0:
             self.writer.add_scalar("Loss/train", loss, step)
 
+    def log_test_loss(self, loss: float, epoch: int):
+        self.writer.add_scalar("Loss/test", loss, epoch)
+
     def log_images(self, grid: Tensor, step: int):
         self.writer.add_image(tag="samples", img_tensor=grid, global_step=step)
