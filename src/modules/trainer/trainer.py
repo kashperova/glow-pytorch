@@ -77,7 +77,7 @@ class Trainer:
             n_iters += 1
 
             if i % self.train_config.sampling_steps == 0:
-                self.log_samples()
+                self.log_samples(step=i)
                 logger.info(f"Train avg loss: {run_train_loss / n_iters}")
 
         return run_train_loss

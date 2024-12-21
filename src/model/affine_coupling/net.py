@@ -19,13 +19,11 @@ class NN(nn.Module):
     """
 
     def __init__(self, in_ch: int, hidden_ch: int):
-        super(NN, self).__init__()
-        conv1 = nn.Conv2d(in_ch // 2, hidden_ch, 3, padding=1)
-        conv2 = nn.Conv2d(hidden_ch, hidden_ch, 1)
+        super().__init__()
         self.net = nn.Sequential(
-            conv1,
+            nn.Conv2d(in_ch // 2, hidden_ch, 3, padding=1),
             nn.ReLU(inplace=True),
-            conv2,
+            nn.Conv2d(hidden_ch, hidden_ch, 1),
             nn.ReLU(inplace=True),
             ZeroConv2d(hidden_ch, in_ch),
         )

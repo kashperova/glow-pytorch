@@ -22,9 +22,9 @@ trainer:
   train_batch_size: 16
   test_batch_size: 16
   image_size: 64
-  log_steps: 10
+  log_steps: 50
   log_dir: ./runs
-  sampling_steps: 10
+  sampling_steps: 50
   n_samples: 10
   samples_dir: samples
   save_dir: glow
