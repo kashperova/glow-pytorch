@@ -1,3 +1,5 @@
+import math
+
 import torch
 from torch import Tensor
 
@@ -24,7 +26,7 @@ def reverse_squeeze(x: Tensor, factor: int = 2) -> Tensor:
 
 def dequantize(x: Tensor, n_bins: int = 256) -> Tensor:
     x = x * 255
-    n_bits = n_bins // 8
+    n_bits = math.log(n_bins, 2)
 
     if n_bits < 8:
         x = torch.floor(x / 2 ** (8 - n_bits))

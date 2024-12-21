@@ -66,7 +66,7 @@ class Trainer:
         self.model.train()
         run_train_loss, n_iters = 0.0, 0
         for i, images in enumerate(self.train_loader):
-            images = dequantize(images)
+            images = dequantize(images, n_bins=self.train_config.n_bins)
             images = images.to(self.device)
             self.optimizer.zero_grad()
             outputs = self.model(images)
@@ -76,9 +76,11 @@ class Trainer:
             run_train_loss += loss.item()
             n_iters += 1
 
-            if i % self.train_config.sampling_steps == 0:
+            if i % self.train_config.sampling_steps == 0 and i != 0:
                 self.log_samples(step=i)
-                logger.info(f"Train avg loss: {run_train_loss / n_iters}")
+                avg_loss = run_train_loss / n_iters
+                self.logger.log_train_loss(loss=avg_loss, step=i)
+                logger.info(f"Train avg loss: {avg_loss}")
 
         return run_train_loss
 
@@ -87,7 +89,7 @@ class Trainer:
         self.model.eval()
         run_test_loss = 0.0
         for images, _ in self.test_loader:
-            images = dequantize(images)
+            images = dequantize(images, self.train_config.n_bins)
             images = images.to(self.device)
             outputs = self.model(images)
             run_test_loss += self.loss_func(outputs, images).item()
@@ -110,7 +112,9 @@ class Trainer:
         self.model = nn.DataParallel(self.model).to(self.device)
 
         with torch.no_grad():
-            images = dequantize(next(iter(self.test_loader)))
+            images = dequantize(
+                next(iter(self.test_loader)), n_bins=self.train_config.n_bins
+            )
             images = images.to(self.device)
             self.model.module(images)
 

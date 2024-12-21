@@ -1,5 +1,4 @@
 import torch
-from fixtures.config import TestConfig
 
 
 class TestAffineCoupling:

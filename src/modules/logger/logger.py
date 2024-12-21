@@ -2,7 +2,6 @@ import os
 
 from torch import Tensor
 from torch.utils.tensorboard import SummaryWriter
-from torchvision import utils
 
 
 class TensorboardLogger:
