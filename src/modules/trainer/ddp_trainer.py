@@ -40,8 +40,8 @@ class DDPTrainer(Trainer):
             test_dataset=self.test_dataset,
         )
 
-    def train_epoch(self) -> float:
-        train_loss = super().train_epoch()
+    def train_epoch(self, epoch: int) -> float:
+        train_loss = super().train_epoch(epoch)
 
         loss_tensor = torch.tensor(train_loss, device=self.ddp.rank)
         dist.all_reduce(loss_tensor, op=dist.ReduceOp.SUM)
@@ -65,5 +65,5 @@ class DDPTrainer(Trainer):
 
             for i in tqdm(range(self.train_config.epochs)):
                 self.ddp.set_train_epoch(i)
-                self.train_epoch()
+                self.train_epoch(i)
                 self.test_epoch()

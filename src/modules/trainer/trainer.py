@@ -119,7 +119,7 @@ class Trainer:
             self.model.module(images)
 
         for i in tqdm(range(self.train_config.n_epochs)):
-            train_loss = self.train_epoch(1)
+            train_loss = self.train_epoch(i)
             train_loss /= len(self.train_dataset)
 
             test_loss = self.test_epoch()
@@ -135,11 +135,11 @@ class Trainer:
             os.makedirs(self.train_config.save_dir, exist_ok=True)
 
         torch.save(
-            self.model.state_dict(), f"{self.train_config.save_dir}/model_{epoch}.pt"
+            self.model.state_dict(), f"{self.train_config.save_dir}/model_{epoch}.bin"
         )
         torch.save(
             self.optimizer.state_dict(),
-            f"{self.train_config.save_dir}/optimizer_{epoch}.pt",
+            f"{self.train_config.save_dir}/optimizer_{epoch}.bin",
         )
 
     @torch.inference_mode()
